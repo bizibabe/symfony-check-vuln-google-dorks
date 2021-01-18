@@ -20,11 +20,14 @@ except ImportError as e:
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-parser=argparse.ArgumentParser(description="This tool allows you to scan the configuration of Symfony's developer mode using Google Dork")
-parser.add_argument("--cookie", dest='cookie', help="You must specify your Google Chrome cookie", type=str, required=True)
-parser.add_argument("--nburl", dest='nburl', help="Specifies the total number of urls to scan", type=str)
-parser.add_argument("--starturl", dest='starturl', help="Specifies which url to start from on Google", type=str)
-parser.add_argument("--skip", dest='skip', help="Do not use the token bruteforce method : --skip true", type=bool, default=False)
+parser=argparse.ArgumentParser(description="This tool allows you to scan the configuration of Symfony's developer mode using Google Dorks")
+parser._action_groups.pop()
+required = parser.add_argument_group('required arguments')
+optional = parser.add_argument_group('optional arguments')
+required.add_argument("--cookie", dest='cookie', help="You must specify your Google Chrome cookie", type=str, required=True)
+optional.add_argument("--nburl", dest='nburl', help="Specifies the total number of urls to scan", type=str)
+optional.add_argument("--starturl", dest='starturl', help="Specifies which url to start from on Google", type=str)
+optional.add_argument("--skip", dest='skip', help="Do not use the token bruteforce method : --skip true", type=bool, default=False)
 args=parser.parse_args()
 
 
@@ -219,12 +222,14 @@ def generate_mutations(url, internal_url, secret, algo):
 
 
 subprocess.Popen("clear",shell=True)
-HEADER=pyfiglet.figlet_format("Symfony token grabber", font = "slant"  ) 
+HEADER=pyfiglet.figlet_format("Symfony vuln checker", font = "slant"  ) 
 VERSION='version:1'
 WRITER='https://github.com/bizibabe/symfony-check-vuln-google-dorks\n'
+BY='By Google Dorks\n'
 print(color.yellow+HEADER)
 print(color.magenta+VERSION.center(70))
 print(color.magenta+WRITER.center(70))
+print(color.magenta+BY.center(70))
 print(color.ResetAll)
 
 totalUrl = 0
@@ -240,7 +245,7 @@ if(args.nburl or args.starturl):
 
 try:
 	print('--------------------------------------------------------------------------------------------------------')
-	url = 'https://www.google.com/search?client=firefox-b-e&start={}&num={}&q={}'.format(startUrl,nbUrl,dork_payload)
+	url = 'https://www.google.com/search?start={}&num={}&q={}'.format(startUrl,nbUrl,dork_payload)
 	r = requests.get(url, headers=headers_Get)
 	soup = BeautifulSoup(r.content, 'lxml')
 	tags = soup.find_all('a')
