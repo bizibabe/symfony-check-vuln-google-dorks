@@ -33,10 +33,15 @@ optional arguments:
 ## After use
 
 Once you find vulnerable websites, you can take things a step further !  
-Token + Fragment = __RCE__ 
+Token + Fragment + internal url = __RCE__ 
 
 ### Best scanner for single url
 (https://github.com/synacktiv/eos/)  
 
-### RCE tool (token + fragment)
+### RCE tool (token + fragment + internal url)
 (https://github.com/ambionics/symfony-exploits)  
+
+
+## Legal disclaimer:
+
+Usage of Symphony Google Dorks Checker Tool for attacking targets without prior mutual consent is illegal. It's the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program. Only use for educational purposes.
