@@ -35,8 +35,8 @@ optional arguments:
 Once you find vulnerable websites, you can take things a step further !  
 Token + Fragment = __RCE__ 
 
-# Best scanner for single url
+### Best scanner for single url
 (https://github.com/synacktiv/eos/)  
 
-# RCE tool (token + fragment)
+### RCE tool (token + fragment)
 (https://github.com/ambionics/symfony-exploits)  
