@@ -289,12 +289,12 @@ try:
 								response = requests.get(urlToken)
 								code = response.status_code
 								if code != 403:
-									print(color.green+'[+] {} is vulnerable [Token found : {}]'.format(url,secret)+color.green+' [_fragment found]')
+									print(color.green+'[+] {} is vulnerable [Token found : {}]'.format(internal_url,secret)+color.green+' [_fragment found]')
 									countVuln = countVuln + 1
 									totalUrl = totalUrl + 1
 									break
 								elif nbMut == totalMutation:
-									print(color.red+'[!] {} maybe vulnerable [Token or internal url not found]'.format(internal_url)+color.green+' [_fragment found]')
+									print(color.orange+'[!] {} maybe vulnerable [Token or internal url not found]'.format(internal_url)+color.green+' [_fragment found]')
 									nbMut = 0
 									totalUrl = totalUrl + 1
 									break
