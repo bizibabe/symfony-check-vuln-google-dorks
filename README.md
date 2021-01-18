@@ -12,4 +12,4 @@ $ python3 -m pip install -r requirements.txt
 1) Create a Google account (gmail)  
 2) Connect with google-chrome 
 3) Copy your cookie on google-chrome after a search  
-<img src="cookie.png" width="100px">  
+<img src="cookie.png" width="500px">  
