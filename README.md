@@ -30,6 +30,12 @@ optional arguments:
 
 ```
 
+## If you have 0 result
+
+1. Reload google chrome and check if you have been detected as a bot > pass the verrication  
+__OR__
+2. Delete your browsing data > reconnect to your google account > recover the new cookie  
+
 ## After use
 
 Once you find vulnerable websites, you can take things a step further !  
