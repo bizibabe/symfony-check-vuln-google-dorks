@@ -1,0 +1,7 @@
+requests
+regex
+bs4
+argparse
+urllib3
+more-itertools
+pyfiglet
