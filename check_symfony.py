@@ -233,6 +233,14 @@ def generate_mutations(url, internal_url, secret, algo):
 
     return list(itertools.product(algos, secrets, internal_urls))
 
+def check_args(args):
+	res = True
+	try:
+		int(args)
+	except(TypeError, ValueError):
+		res = False
+	return res
+
 
 subprocess.Popen("clear",shell=True)
 HEADER=pyfiglet.figlet_format("Symfony vuln checker", font = "slant"  ) 
@@ -251,10 +259,15 @@ nbMut = 0
 startUrl = '0'
 countVuln = 0
 dork_payload = 'intitle:"index of" "app_dev.php"'
-if(args.nburl or args.starturl):
-	nbUrl = args.nburl
-	startUrl = args.starturl
 
+if(args.nburl):
+	if(not check_args(args.nburl)):
+		print(color.orange+'[!] Parameter nburl must be int')
+		sys.exit(1)
+if(args.starturl):
+	if(not check_args(args.starturl)):
+		print(color.orange+'[!] Parameter starturl must be int')
+		sys.exit(1)
 
 try:
 	print('--------------------------------------------------------------------------------------------------------')
