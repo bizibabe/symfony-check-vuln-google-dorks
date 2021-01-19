@@ -34,6 +34,8 @@ optional arguments:
 
 ```
 
+<img src="output.png" width="500px">  
+
 ## If you have 0 result
 
 1. Reload google chrome and check if you have been detected as a bot > pass the verrication  
