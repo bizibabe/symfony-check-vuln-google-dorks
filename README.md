@@ -8,6 +8,7 @@ Usage of Symphony Google Dorks Checker Tool for attacking targets without prior 
 
 ```bash
 $ git clone https://github.com/bizibabe/symfony-check-vuln-google-dorks.git
+$ cd symfony-check-vuln-google-dorks
 $ python3 -m pip install -r requirements.txt
 ```
 
