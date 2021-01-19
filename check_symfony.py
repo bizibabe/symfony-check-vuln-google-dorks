@@ -283,9 +283,7 @@ try:
 				url = fix_url(url)
 				try:
 					check0 = requests.get(url, verify=False, timeout=5)
-					print(url)
 					url = fix_index_url(url,check0.text)
-					print(url)
 					check1 = requests.get(url+'app_dev.php', verify=False, timeout=5)
 					if(check1.status_code != 403):
 						check2 = requests.get(url+'app_dev.php/_profiler/open?file=app/config/parameters.yml', verify=False, timeout=5)
