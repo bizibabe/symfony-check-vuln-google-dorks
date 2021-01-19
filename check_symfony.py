@@ -250,6 +250,7 @@ nbMut = 0
 startUrl = '0'
 countVuln = 0
 dork_payload = 'intitle:"index of" "app_dev.php"'
+end = 0
 
 if(args.nburl):
 	if(not check_args(args.nburl)):
@@ -266,7 +267,7 @@ if(args.starturl):
 
 try:
 	print('--------------------------------------------------------------------------------------------------------')
-	url = 'https://www.google.com/search?start={}&num={}&q={}'.format(startUrl,nbUrl,dork_payload)
+	url = 'https://www.google.co.th/search?start={}&num={}&q={}'.format(startUrl,nbUrl,dork_payload)
 	r = requests.get(url, headers=headers_Get)
 	if(robot_detector(r.text)):
 		soup = BeautifulSoup(r.content, 'lxml')
@@ -274,7 +275,10 @@ try:
 		for tag in tags:
 			url = tag.get('href')
 			if(url == "#" or url == None or re.search(".*google..*", url) or re.search("^/search?.*", url) or not re.search("^http.*", url)):
-				pass
+				end = end + 1
+				if(end == len(tags)):
+					print(Fore.RED+'[!] Limit reached')
+					sys.exit(1)
 			else:
 				url = fix_url(url)
 				try:

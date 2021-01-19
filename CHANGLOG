@@ -1,6 +1,7 @@
 # Release History
 
 # 1.1
+    * ADD: limit Google Dorks
     * IMPROVEMENT: speed
     * CHANGE: README
     * FIX: function fix_index_url
