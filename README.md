@@ -15,20 +15,21 @@ $ python3 -m pip install -r requirements.txt
 ## How to use this script
 
 1. Create a Google Gmail account (possible to ban)
-2. Connect on your new Gmail account 
+2. Connect on your new Gmail account / refresh  
 3. python3 check_symfony.py --starturl 0 --nburl 20 
 
 ```bash
-usage: check_symfony.py [-h] [--nburl NBURL] [--starturl STARTURL] [--skip SKIP]
+usage: check_symfony.py [-h] [--nburl NBURL] [--starturl STARTURL] [--jmp JMP]
 
 This tool allows you to scan the configuration of Symfony developer mode using Google Dorks
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --nburl NBURL        Specifies the total number of urls to scan
-  --starturl STARTURL  Specifies which url to start from on Google
-  --skip SKIP          Do not use the token bruteforce method : --skip true
-
+  -h, --help            show this help message and exit
+  --nburl NBURL, -n NBURL
+                        Specifies the total number of urls to scan
+  --starturl STARTURL, -s STARTURL
+                        Specifies which url to start from on Google
+  --jmp JMP, -j JMP     Do not use the token bruteforce method : --jmp true
 
 ```
 

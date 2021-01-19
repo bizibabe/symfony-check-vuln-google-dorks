@@ -1,9 +1,10 @@
 # Release History
 
 # 1.1
+    * IMPROVEMENT: speed
     * CHANGE: README
     * FIX: function fix_index_url
-    * FIX: color + requests (Windows OS)
+    * FIX: color + requests Header (Windows OS)
     * REMOVE: cookie parameter
     * ADD: Robot detector : script exited
 
