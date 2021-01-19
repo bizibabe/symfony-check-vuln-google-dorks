@@ -267,7 +267,7 @@ if(args.starturl):
 
 try:
 	print('--------------------------------------------------------------------------------------------------------')
-	url = 'https://www.google.co.th/search?start={}&num={}&q={}'.format(startUrl,nbUrl,dork_payload)
+	url = 'https://www.google.com/search?start={}&num={}&q={}'.format(startUrl,nbUrl,dork_payload)
 	r = requests.get(url, headers=headers_Get)
 	if(robot_detector(r.text)):
 		soup = BeautifulSoup(r.content, 'lxml')
