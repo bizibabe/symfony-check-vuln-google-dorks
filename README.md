@@ -16,7 +16,7 @@ $ python3 -m pip install -r requirements.txt
 1. Create a Google account (gmail)  
 2. Connect with google-chrome 
 3. Copy your cookie on google-chrome after a search  
-<img src="cookie.png" width="500px">   
+<img src="images/cookie.png" width="500px">   
 4. python3 check_symfony.py --cookie "{YOUR-COOKIE}"  
 
 ```bash
@@ -34,7 +34,7 @@ optional arguments:
 
 ```
 
-<img src="output.png" width="500px">  
+<img src="images/output.png" width="500px">  
 
 ## If you have 0 result
 
