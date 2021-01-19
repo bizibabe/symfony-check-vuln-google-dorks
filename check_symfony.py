@@ -10,7 +10,7 @@ try:
 	import urllib3
 	import itertools
 	import sys
-	import subprocess
+	import os
 	import pyfiglet
 except ImportError as e:
     print("The error occured: %s"%e)
@@ -242,7 +242,7 @@ def check_args(args):
 	return res
 
 
-subprocess.Popen("clear",shell=True)
+os.system('cls' if os.name == 'nt' else 'clear')
 HEADER=pyfiglet.figlet_format("Symfony vuln checker", font = "slant"  ) 
 VERSION='version:1'
 WRITER='https://github.com/bizibabe/symfony-check-vuln-google-dorks\n'
