@@ -1,0 +1,17 @@
+# Release History
+
+# 1.1
+    * CHANGE: README
+    * FIX: function fix_index_url
+    * FIX: color + requests (Windows OS)
+    * REMOVE: cookie parameter
+    * ADD: Robot detector : script exited
+
+# 1.0
+    * ADD: app_dev.php detecor
+    * ADD: _fragment detector
+    * ADD: _profiler open file parameters.yml detector (Bad config)
+    * ADD: _configurator/final detector (Symfony < 2.7.13 exploit)
+    * ADD: bruteforce token method (external address = internal address)
+
+

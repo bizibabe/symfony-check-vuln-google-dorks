@@ -14,24 +14,21 @@ $ python3 -m pip install -r requirements.txt
 
 ## How to use this script
 
-1. Create a Google account (gmail)  
-2. Connect with google-chrome 
-3. Copy your cookie on google-chrome after a search  
-<img src="images/cookie.png" width="500px">   
-4. python3 check_symfony.py --cookie "{YOUR-COOKIE}"  
+1. Create a Google Gmail account (possible to ban)
+2. Connect on your new Gmail account 
+3. python3 check_symfony.py --starturl 0 --nburl 20 
 
 ```bash
-usage: check_symfony.py [-h] --cookie COOKIE [--nburl NBURL] [--starturl STARTURL] [--skip SKIP]
+usage: check_symfony.py [-h] [--nburl NBURL] [--starturl STARTURL] [--skip SKIP]
 
 This tool allows you to scan the configuration of Symfony developer mode using Google Dorks
 
-required arguments:
-  --cookie COOKIE      You must specify your Google Chrome cookie
-
 optional arguments:
+  -h, --help           show this help message and exit
   --nburl NBURL        Specifies the total number of urls to scan
   --starturl STARTURL  Specifies which url to start from on Google
   --skip SKIP          Do not use the token bruteforce method : --skip true
+
 
 ```
 
@@ -41,7 +38,7 @@ optional arguments:
 
 1. Reload google chrome and check if you have been detected as a bot > pass the verrication  
 __OR__
-2. Delete your browsing data > reconnect to your google account > recover the new cookie  
+2. Delete your browsing data > reconnect to your google account 
 
 ## After use
 
