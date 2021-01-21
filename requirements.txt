@@ -6,3 +6,4 @@ urllib3
 more-itertools
 pyfiglet
 lxml
+colorama
