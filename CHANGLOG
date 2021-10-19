@@ -1,5 +1,14 @@
 # Release History
 
+# 1.2
+    * ADD: Session requests python
+    * ADD: Disable Google filter search
+    * ADD: Private mode
+    * ADD: Cookie parameter (bypass Captcha)
+    * ADD: Synfony ressource check
+    * ADD: Change dorks payload
+    * FIX: Several false positives
+    * FIX: Robot detector
 # 1.1
     * ADD: limit Google Dorks
     * IMPROVEMENT: speed
