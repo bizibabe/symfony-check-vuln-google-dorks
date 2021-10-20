@@ -327,19 +327,19 @@ try:
 										print(Fore.GREEN+'[+] {}{} is vulnerable [Token and creds found] [_fragment found]'.format(url,vuln))
 										countVuln = countVuln + 1
 										totalUrl = totalUrl + 1
-										break
 									else:
 										print(Fore.YELLOW+'[!] {}{} maybe vulnerable'.format(url,vuln)+Fore.GREEN+' [Token and creds found]'+Fore.RED+' [_fragment not found]')
 										totalUrl = totalUrl + 1
+									break
 								elif(re.search(".*resource:.*",check_vuln.text)):
 									vuln_test = 1
 									if(check_fragment.status_code == 403):
 										print(Fore.YELLOW+'[+] {}{} maybe vulnerable'.format(url,vuln)+Fore.GREEN+' [Ressource found in url] [_fragment found]')
 										totalUrl = totalUrl + 1
-										break
 									else:
 										print(Fore.YELLOW+'[!] {}{} maybe vulnerable'.format(url,vuln)+Fore.GREEN+' [Ressource found in url]'+Fore.RED+' [_fragment not found]')
 										totalUrl = totalUrl + 1
+									break
 							if(vuln_test == 0):
 								if(check_fragment.status_code == 403):
 									if(args.jmp != True):
