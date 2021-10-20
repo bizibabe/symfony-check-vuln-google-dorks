@@ -273,7 +273,7 @@ countRegex = 0
 end = 0
 listUrl = list()
 url_vuln = ["app_dev.php/_profiler/open?file=app/config/parameters.yml", "app_dev.php/_configurator/final"]
-url_regex = ["github.com", "git.", "coderoad.ru", "developpez.net"]
+url_regex = ["github.com", "git.", "coderoad.ru", "developpez.net", "/blob/", "searchcode.com", "php-download.com"]
 
 if(args.all):
 	dork_payload = 'inurl:"app_dev.php" | intitle:"index of" "app_dev.php"'
@@ -305,7 +305,7 @@ try:
 			if(url == "#" or url == None or re.search(".*google..*", url) or re.search("^/search?.*", url) or not re.search("^http.*", url)):
 				end += 1
 				pass
-			elif(check_regex(url, url_regex)):
+			elif(args.all and check_regex(url, url_regex)):
 				end += 1
 				countRegex += 1
 			else:
