@@ -300,6 +300,7 @@ try:
 				if url not in listUrl:
 					listUrl.append(url)
 					try:
+						vuln_test = 0
 						check0 = s.get(url, verify=False, timeout=5)
 						url = fix_index_url(url,check0.text)
 						check_debug = s.get(url+'app_dev.php', verify=False, timeout=5)
@@ -308,6 +309,7 @@ try:
 							for vuln in url_vuln:
 								check_vuln = s.get(url+vuln, verify=False, timeout=5)
 								if(check_vuln.url == url+vuln and check_vuln.status_code == 200 and not re.search(".*Token not found.*", str(check_vuln.content)) and re.search(".*database_host.*",check_vuln.text)):
+									vuln_test = 1
 									if(check_fragment.status_code == 403):
 										print(Fore.GREEN+'[+] {}{} is vulnerable [Token and creds found] [_fragment found]'.format(url,vuln))
 										countVuln = countVuln + 1
@@ -317,6 +319,7 @@ try:
 										print(Fore.YELLOW+'[!] {}{} maybe vulnerable'.format(url,vuln)+Fore.GREEN+' [Token and creds found]'+Fore.RED+' [_fragment not found]')
 										totalUrl = totalUrl + 1
 								elif(re.search(".*resource:.*",check_vuln.text)):
+									vuln_test = 1
 									if(check_fragment.status_code == 403):
 										print(Fore.YELLOW+'[+] {}{} maybe vulnerable'.format(url,vuln)+Fore.GREEN+' [Ressource found in url] [_fragment found]')
 										totalUrl = totalUrl + 1
@@ -324,7 +327,7 @@ try:
 									else:
 										print(Fore.YELLOW+'[!] {}{} maybe vulnerable'.format(url,vuln)+Fore.GREEN+' [Ressource found in url]'+Fore.RED+' [_fragment not found]')
 										totalUrl = totalUrl + 1
-							else:
+							if(vuln_test == 0):
 								if(check_fragment.status_code == 403):
 									if(args.jmp != True):
 										urlFragment = url+'app_dev.php/_fragment'
@@ -341,8 +344,6 @@ try:
 												countVuln = countVuln + 1
 												totalUrl = totalUrl + 1
 												break
-											else:
-												pass
 										else:
 											print(Fore.YELLOW+'[!] {} maybe vulnerable [Token or internal url not found]'.format(internal_url)+Fore.GREEN+' [_fragment found]')
 											nbMut = 0
