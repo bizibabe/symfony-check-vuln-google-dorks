@@ -296,9 +296,7 @@ try:
 				end += 1
 				countRegex += 1
 			else:
-				print(url)
 				url = fix_url(url)
-				print(url)
 				if url not in listUrl:
 					listUrl.append(url)
 					try:
