@@ -272,7 +272,7 @@ countVuln = 0
 countRegex = 0
 end = 0
 listUrl = list()
-url_vuln = ["app_dev.php/_profiler/open?file=app/config/parameters.yml", "app_dev.php/_configurator/final"]
+url_vuln = ["app_dev.php/_profiler/open?file=app/config/parameters.yml&line=1", "app_dev.php/_configurator/final"]
 url_regex = ["github.com", "git.", "coderoad.ru", "developpez.net", "/blob/", "searchcode.com", "php-download.com"]
 
 if(args.all):
