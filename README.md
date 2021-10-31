@@ -14,7 +14,7 @@ $ python3 -m pip install -r requirements.txt
 
 ## How to use this script
 
-1. Create a Google Gmail account (possible to ban)
+1. Create a Google Gmail account (Bypass Captcha)
 2. Connect on your new Gmail account / refresh  
 3. python3 check_symfony.py --starturl 0 --nburl 20 -c YOUR_GOOGLE_COOKIE
 
